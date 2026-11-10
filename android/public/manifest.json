@@ -1,0 +1,13 @@
+{
+  "background_color": "#090202",
+  "dir": "ltr",
+  "display": "standalone",
+  "name": "ACLEDA CyberNode",
+  "orientation": "any",
+  "scope": "/",
+  "short_name": "ACLEDA CyberNode",
+  "start_url": "/",
+  "theme_color": "#060101",
+  "id": "acleda-cybernode",
+  "description": "EXECUTIVE"
+}
